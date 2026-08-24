@@ -23,7 +23,11 @@ if TYPE_CHECKING:
 
 @dataclass
 class NixlKVConnectorStats(KVConnectorStats):
-    """Container for transfer performance metrics"""
+    """Container for NIXL transfer performance metrics.
+
+    The statistics are collected from NIXL transfers and aggregated across
+    all workers before being logged or exported to Prometheus.
+    """
 
     def __post_init__(self):
         if not self.data:
@@ -84,7 +88,8 @@ class NixlKVConnectorStats(KVConnectorStats):
         return self
 
     def reduce(self) -> dict[str, int | float]:
-        # Compute compact representative stats suitable for CLI logging
+        # Reduce the observations collected during the logging interval into
+        # representative values for CLI logging.
         if self.num_successful_transfers == 0:
             # CLI logging only reports successful transfers stats. If all requests in
             # the interval were unsuccessful, Prom will report failures stats instead.
